@@ -8,3 +8,11 @@ export interface LoginCredentials {
 export interface LoginResponse {
   token: string;
 }
+export interface LoginResponse {
+  access: string;
+  refresh: string;
+  user: {
+    first_name: string;
+    email: string;
+  };
+}

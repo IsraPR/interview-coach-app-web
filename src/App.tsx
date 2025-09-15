@@ -1,21 +1,19 @@
-import { 
-  BrowserRouter as Router, 
-  Routes, 
-  Route, 
-  Link, 
-  useNavigate // 👈 1. Import useNavigate
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
 } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/store/slices/authSlice';
 import { useShallow } from 'zustand/react/shallow';
+import styles from './App.module.css';
 
-// 👇 2. Create a new component for our main application content
 const AppContent = () => {
-  // Now we are inside a component that is a descendant of <Router>
-  const navigate = useNavigate(); // 👈 3. Safely call the hook here
-
+  const navigate = useNavigate();
   const { token, logout } = useAuthStore(
     useShallow((state) => ({
       token: state.token,
@@ -25,11 +23,11 @@ const AppContent = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true }); // 👈 4. Use the navigate function
+    navigate('/login', { replace: true });
   };
 
   return (
-    <>
+    <div className={styles.rootLayout}>
       <nav style={{ padding: '1rem', background: '#eee', display: 'flex', justifyContent: 'space-between' }}>
         <div>
           {token && (
@@ -47,19 +45,33 @@ const AppContent = () => {
         </div>
       </nav>
 
-      <main style={{ padding: '1rem' }}>
+      <main className={styles.mainContent}>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<HomePage />} />
-          </Route>
+          {token ? (
+            // If user IS logged in
+            <>
+              <Route path="/" element={<HomePage />} />
+              {/* Add other protected routes here, e.g., /dashboard, /profile */}
+              
+              {/* 👇 This is a catch-all that redirects any invalid URL back to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          ) : (
+            // If user IS NOT logged in
+            <>
+              <Route path="/login" element={<LoginPage />} />
+
+              {/* 👇 This is a catch-all that redirects any invalid URL to the login page */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          )}
         </Routes>
       </main>
-    </>
+    </div>
   );
 };
 
-// 👇 5. The main App component now just sets up the Router
+
 function App() {
   return (
     <Router>

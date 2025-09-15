@@ -1,49 +1,54 @@
 import { create } from 'zustand';
-import { login as loginService } from '@/services/authService'; // We will create this next
-import { LoginCredentials } from '@/types'; // And this too
+import { login as loginService } from '@/services/authService';
+import type { LoginCredentials } from '@/types';
+import { useNotificationStore } from './notificationSlice';
 
-// Define the shape of our state
 interface AuthState {
   token: string | null;
   status: 'idle' | 'loading' | 'success' | 'error';
-  error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   hydrateAuth: () => void;
-  successMessage: string | null; // 👈 Add this
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  // Initial state
   token: null,
   status: 'idle',
-  error: null,
-  successMessage: null, // 👈 Add initial state
 
-  // Action to handle login
   login: async (credentials) => {
-    set({ status: 'loading', error: null, successMessage: null }); 
+    set({ status: 'loading' });
     try {
-      const { token } = await loginService(credentials);
-      set({ token, status: 'success', successMessage: 'Login successful! Redirecting...' });
-      // In a real app, you'd also save the token to localStorage here
-      localStorage.setItem('authToken', token);
+      const response = await loginService(credentials);
+      const accessToken = response.access;
+
+      if (!accessToken) {
+        throw new Error('Login failed: No access token received.');
+      }
+      
+      set({ token: accessToken, status: 'success' });
+      localStorage.setItem('authToken', accessToken);
+
+      // 👇 TRIGGER the notification in the other store
+      useNotificationStore.getState().showNotification('Login successful!', 'success');
+
     } catch (error: any) {
       const errorMessage = error.message || 'An unknown error occurred';
-      set({ status: 'error', error: errorMessage });
+      set({ status: 'error' });
+      
+      // 👇 TRIGGER an error notification
+      useNotificationStore.getState().showNotification(errorMessage, 'error');
     }
   },
 
-  // Action to handle logout
   logout: () => {
     set({ token: null, status: 'idle' });
     localStorage.removeItem('authToken');
   },
+
   hydrateAuth: () => {
     const token = localStorage.getItem('authToken');
     if (token) {
       set({ token, status: 'success' });
-      console.log('Auth state hydrated from localStorage.');
     }
   },
 }));

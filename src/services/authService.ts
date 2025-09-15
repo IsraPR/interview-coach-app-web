@@ -1,5 +1,5 @@
 import { restClient } from '@/lib/axios';
-import { LoginCredentials, LoginResponse } from '@/types';
+import type { LoginCredentials, LoginResponse } from '@/types';
 import axios from 'axios'; // Import axios to use its type guards
 
 // This is the REAL login function.
