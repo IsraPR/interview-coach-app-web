@@ -1,0 +1,73 @@
+.profileContainer {
+  position: relative;
+}
+
+.profileButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  z-index: 100;
+  border: 1px solid #eee;
+  overflow: hidden;
+}
+
+.userInfo {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfo strong {
+  font-weight: 600;
+}
+
+.userInfo span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.menuList {
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #333;
+  text-decoration: none;
+}
+
+.menuItem:hover {
+  background-color: #f5f5f5;
+}
+
+.icon {
+  margin-right: 12px;
+  color: #555;
+}

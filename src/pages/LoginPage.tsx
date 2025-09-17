@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '@/store/slices/authSlice';
-import { useNotificationStore } from '@/store/slices/notificationSlice';
-import NotificationBanner from '@/components/common/NotificationBanner';
 import { useShallow } from 'zustand/react/shallow';
 import styles from './LoginPage.module.css';
 
@@ -13,16 +11,6 @@ const LoginPage = () => {
     useShallow((state) => ({
       login: state.login,
       status: state.status,
-    }))
-  );
-
-  // Get the notification state for displaying errors
-  const { isVisible, message, type, hideNotification } = useNotificationStore(
-    useShallow((state) => ({
-      isVisible: state.isVisible,
-      message: state.message,
-      type: state.type,
-      hideNotification: state.hideNotification,
     }))
   );
 
@@ -39,14 +27,6 @@ const LoginPage = () => {
         <h1>Login</h1>
         <form onSubmit={handleSubmit}>
          {/* Only show the banner if it's an error on the login page */}
-          {isVisible && type === 'error' && message && (
-            <NotificationBanner
-              message={message}
-              type={type}
-              onClose={hideNotification}
-            />
-          )}
-
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
             <input

@@ -1,0 +1,95 @@
+/* src/pages/SpeechPage.module.css */
+
+.liveInterviewPageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px;
+  height: 100%;
+  gap: 20px;
+}
+
+.statusIndicator {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 5px 15px;
+  border-radius: 15px;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Status-specific colors */
+.statusIDLE { background-color: #6c757d; }
+.statusCONNECTING { background-color: #007bff; }
+.statusCONNECTED { background-color: #28a745; }
+.statusDISCONNECTED { background-color: #dc3545; }
+.statusERROR { background-color: #dc3545; }
+
+.transcriptBox {
+  width: 100%;
+  max-width: 700px;
+  min-height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+  overflow-y: auto;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.micButton {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.5rem;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.micButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.micButtonReady {
+  background-color: #007bff;
+}
+.micButtonReady:hover {
+  background-color: #0056b3;
+}
+
+.micButtonRecording {
+  background-color: #dc3545;
+  /* Glowing effect for recording */
+  box-shadow: 0 0 0 0 rgba(220, 53, 69, 1);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+.errorContainer {
+  width: 100%;
+  max-width: 700px;
+}

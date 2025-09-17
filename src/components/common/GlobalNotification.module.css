@@ -1,0 +1,10 @@
+/* src/components/common/GlobalNotification.module.css */
+
+.notificationContainer {
+  position: fixed; /* Positions relative to the viewport */
+  top: 80px;       /* Space from the top (adjust as needed) */
+  right: 20px;     /* Space from the right */
+  z-index: 1000;   /* Ensures it appears on top of other content */
+  width: 100%;
+  max-width: 350px; /* A good width for notifications */
+}
