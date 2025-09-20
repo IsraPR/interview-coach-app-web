@@ -43,6 +43,9 @@ export class NovaEventFactory {
           toolUseOutputConfiguration: {
             mediaType: "application/json",
           },
+          toolConfiguration: {
+            "tools": []
+          }
           // We can omit the toolConfiguration if not using tools for now
         },
       },
@@ -56,7 +59,7 @@ export class NovaEventFactory {
           promptName,
           contentName,
           type: 'TEXT',
-          interactive: true,
+          interactive: false,
           role,
           textInputConfiguration: {
             mediaType: 'text/plain',
