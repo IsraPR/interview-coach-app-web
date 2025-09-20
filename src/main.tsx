@@ -4,7 +4,6 @@ import './index.css'
 import App from './App.tsx'
 import { useAuthStore } from './store/slices/authSlice.ts';
 
-// 👇 Call the hydrate action right away
 useAuthStore.getState().hydrateAuth();
 
 createRoot(document.getElementById('root')!).render(

@@ -3,11 +3,11 @@ import {
   Routes,
   Route,
   Link,
-  Navigate, // We still need Navigate for the declarative redirect
+  Navigate,
 } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
-import LiveInterviewPage from '@/pages/LiveInterviewPage'; // 👈 1. Import the new page
+import LiveInterviewPage from '@/pages/LiveInterviewPage'; 
 import { useAuthStore } from '@/store/slices/authSlice';
 import styles from './App.module.css';
 import { useEffect } from 'react';
@@ -39,7 +39,6 @@ const AppContent = () => {
               <Link to="/" style={{ marginRight: '1rem' }}>
                 Home
               </Link>
-              {/* 👇 2. Add the navigation link to our new page */}
               <Link to="/interview" style={{ marginRight: '1rem' }}>
                 Live Interview
               </Link>
