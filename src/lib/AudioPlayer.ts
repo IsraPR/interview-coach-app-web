@@ -10,9 +10,14 @@ export default class AudioPlayer {
 
     this.audioContext = new AudioContext({ sampleRate: 24000 });
 
-    // The URL must be absolute from the public directory
     const workletUrl = '/audio/audioPlayerProcessor.worklet.js';
-    await this.audioContext.audioWorklet.addModule(workletUrl);
+    // Use a try-catch block for better error handling if the module fails to load
+    try {
+      await this.audioContext.audioWorklet.addModule(workletUrl);
+    } catch (e) {
+      console.error(`Failed to load audio worklet at ${workletUrl}`, e);
+      return;
+    }
 
     this.workletNode = new AudioWorkletNode(this.audioContext, "audio-player-processor");
     this.workletNode.connect(this.audioContext.destination);
@@ -40,5 +45,14 @@ export default class AudioPlayer {
       type: "audio",
       audioData: samples,
     });
+  }
+
+  bargeIn() {
+    if (!this.initialized || !this.workletNode) return;
+    
+    this.workletNode.port.postMessage({
+      type: "barge-in",
+    });
+    console.log('Audio player barged in.');
   }
 }

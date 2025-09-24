@@ -10,7 +10,6 @@ import { base64ToFloat32Array, processAudioData } from '@/lib/audioHelper';
 import AudioPlayer from '@/lib/AudioPlayer';
 
 export const useNovaSpeech = () => {
-  // --- State Management ---
   const {
     connectionStatus,
     isRecording,
@@ -22,7 +21,6 @@ export const useNovaSpeech = () => {
     resetNovaState,
   } = useNovaStore(useShallow((state) => state));
 
-  // --- Refs for Audio Tools and Session Data ---
   const audioPlayerRef = useRef<AudioPlayer | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
@@ -32,13 +30,31 @@ export const useNovaSpeech = () => {
   const promptNameRef = useRef<string | null>(null);
   const audioContentNameRef = useRef<string | null>(null);
 
-  // --- WebSocket Message Handling ---
   const handleWebSocketMessage = useCallback((data: any) => {
     const event = data.event;
     if (!event) return;
 
     if (event.textOutput) {
-      setTranscript(event.textOutput.content);
+      const content = event.textOutput.content;
+      
+      // --- BARGE-IN ---
+      if (content.startsWith('{')) {
+        try {
+          const parsedContent = JSON.parse(content);
+          if (parsedContent.interrupted === true) {
+            console.log('Interruption event received from server.');
+            audioPlayerRef.current?.bargeIn();
+            return; // Stop processing this event further
+          }
+        } catch (e) {
+          console.error(e);
+          // Not a valid JSON, so treat it as regular text.
+        }
+      }
+      
+      // If it's not an interruption, it's a regular transcript.
+      setTranscript(content);
+
     } else if (event.audioOutput) {
       const audioData = base64ToFloat32Array(event.audioOutput.content);
       audioPlayerRef.current?.playAudio(audioData);
@@ -56,7 +72,6 @@ export const useNovaSpeech = () => {
     }
   }, [setConnectionStatus, stopRecordingSession]);
 
-  // --- Session Control ---
   const startSession = useCallback(async () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/^http/, 'ws');
     const fullUrl = `${baseUrl}/ws/interview/live-interaction/`;
@@ -65,17 +80,14 @@ export const useNovaSpeech = () => {
     setConnectionStatus('CONNECTING');
 
     try {
-      // 1. Initialize the high-performance audio player
       audioPlayerRef.current = new AudioPlayer();
       await audioPlayerRef.current.start();
 
-      // 2. Connect the WebSocket and register handlers
       await webSocketClient.connect(fullUrl);
       setConnectionStatus('CONNECTED');
       webSocketClient.registerOnMessageHandler(handleWebSocketMessage);
       webSocketClient.registerOnCloseHandler(handleWebSocketClose);
 
-      // 3. Generate session IDs and send the initial event sequence
       promptNameRef.current = crypto.randomUUID();
       const systemPromptContentName = crypto.randomUUID();
       audioContentNameRef.current = crypto.randomUUID();
@@ -87,7 +99,6 @@ export const useNovaSpeech = () => {
       webSocketClient.send(NovaEventFactory.contentEnd(promptNameRef.current, systemPromptContentName));
       webSocketClient.send(NovaEventFactory.contentStartAudio(promptNameRef.current, audioContentNameRef.current));
 
-      // 4. Set up the microphone for raw audio processing
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
@@ -101,7 +112,6 @@ export const useNovaSpeech = () => {
       scriptProcessorRef.current = processor;
 
       processor.onaudioprocess = (e) => {
-        // Use the global state to check if we should be processing
         if (useNovaStore.getState().isRecording) {
           const inputData = e.inputBuffer.getChannelData(0);
           const base64Audio = processAudioData(inputData, context.sampleRate);
@@ -125,7 +135,6 @@ export const useNovaSpeech = () => {
   }, [connectionStatus, setConnectionStatus, handleWebSocketMessage, handleWebSocketClose, startRecordingSession]);
 
   const stopSession = useCallback(() => {
-    // Stop microphone processing
     if (mediaStreamSourceRef.current && scriptProcessorRef.current) {
       mediaStreamSourceRef.current.disconnect();
       scriptProcessorRef.current.disconnect();
@@ -137,23 +146,19 @@ export const useNovaSpeech = () => {
       mediaStreamRef.current.getTracks().forEach(track => track.stop());
     }
     
-    // Send session end events
     if (promptNameRef.current && audioContentNameRef.current) {
       webSocketClient.send(NovaEventFactory.contentEnd(promptNameRef.current, audioContentNameRef.current));
       webSocketClient.send(NovaEventFactory.promptEnd(promptNameRef.current));
     }
     webSocketClient.send(NovaEventFactory.sessionEnd());
     
-    // Update state and disconnect
     stopRecordingSession();
     webSocketClient.disconnect();
     setConnectionStatus('IDLE');
   }, [stopRecordingSession, setConnectionStatus]);
 
-  // --- Cleanup Effect ---
   useEffect(() => {
     return () => {
-      // This runs when the component unmounts, ensuring everything is shut down
       audioPlayerRef.current?.stop();
       if (mediaStreamRef.current) {
         mediaStreamRef.current.getTracks().forEach(track => track.stop());
@@ -166,7 +171,6 @@ export const useNovaSpeech = () => {
     };
   }, [resetNovaState]);
 
-  // --- Public API ---
   return {
     connectionStatus,
     isRecording,
