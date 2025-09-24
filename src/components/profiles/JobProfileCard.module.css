@@ -1,0 +1,126 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.activeCard {
+  border-left: 5px solid #007bff;
+}
+
+.activeBadge {
+  position: static;
+  top: 15px;
+  right: -45px;
+  background-color: #007bff;
+  color: white;
+  padding: 5px 40px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transform: none;
+  text-align: center;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.icon {
+  color: #007bff;
+  font-size: 1.5rem;
+}
+
+.profileName {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.cardBody {
+  margin-bottom: 15px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.detailIcon {
+  color: #555;
+}
+
+.targetRole {
+  margin: 0;
+  font-weight: 500;
+  color: #444;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.cardFooter {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: right;
+}
+
+
+.cardTop {
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  align-items: center;
+}
+
+.menuContainer {
+  z-index: 11; /* Ensure it's above the badge */
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.menuItem:hover {
+  background-color: #f5f5f5;
+}
+
+.menuItem:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}
+
+.deleteItem {
+  color: #dc3545;
+}

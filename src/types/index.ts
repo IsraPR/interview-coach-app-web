@@ -19,3 +19,21 @@ export interface User {
   first_name: string;
   last_name: string;
 }
+
+export interface JobProfile {
+  id: number;
+  profile_name: string;
+  target_role: string;
+  job_description_text: string;
+  resume_text: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CreateJobProfilePayload = {
+  profile_name: string;
+  target_role: string;
+  job_description_text: string;
+};
+
+export type UpdateJobProfilePayload = Partial<CreateJobProfilePayload>;

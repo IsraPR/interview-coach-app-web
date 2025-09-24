@@ -7,17 +7,18 @@ import {
 } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
-import LiveInterviewPage from '@/pages/LiveInterviewPage'; 
+import LiveInterviewPage from '@/pages/LiveInterviewPage';
+import JobProfilesPage from '@/pages/JobProfilesPage'; 
+import JobProfileDetailPage from '@/pages/JobProfileDetailPage'; 
 import { useAuthStore } from '@/store/slices/authSlice';
 import styles from './App.module.css';
 import { useEffect } from 'react';
 import ProfileDropdown from '@/components/layout/ProfileDropdown';
 import { useUserStore } from '@/store/slices/userSlice';
 import GlobalNotification from '@/components/common/GlobalNotification';
-const AppContent = () => {  
-  // We only need the token to decide which routes and nav items to show.
-  const token = useAuthStore((state) => state.token);
 
+const AppContent = () => {
+  const token = useAuthStore((state) => state.token);
   const fetchUserProfile = useUserStore((state) => state.fetchUserProfile);
   const clearUserProfile = useUserStore((state) => state.clearUserProfile);
 
@@ -36,37 +37,34 @@ const AppContent = () => {
         <div>
           {token && (
             <>
-              <Link to="/" style={{ marginRight: '1rem' }}>
-                Home
-              </Link>
-              <Link to="/interview" style={{ marginRight: '1rem' }}>
-                Live Interview
-              </Link>
+              <Link to="/" style={{ marginRight: '1rem' }}>Home</Link>
+              {/* 👇 Add the new nav link */}
+              <Link to="/profiles" style={{ marginRight: '1rem' }}>Job Profiles</Link>
+              <Link to="/interview" style={{ marginRight: '1rem' }}>Live Interview</Link>
             </>
           )}
         </div>
         <div>
-          {!token ? (
-            <Link to="/login">Login</Link>
-          ) : (
-            <ProfileDropdown />
-          )}
+          {!token ? <Link to="/login">Login</Link> : <ProfileDropdown />}
         </div>
       </nav>
 
       <main className={styles.mainContent}>
         <Routes>
           {token ? (
-            // If user IS logged in
+            // Logged-in routes
             <>
               <Route path="/" element={<HomePage />} />
-              {/* Add a placeholder for the future profile page */}
               <Route path="/profile" element={<div>My Profile Page</div>} />
               <Route path="/interview" element={<LiveInterviewPage />} />
+              {/* 👇 Add the new routes */}
+              <Route path="/profiles" element={<JobProfilesPage />} />
+              <Route path="/profiles/:profileId" element={<JobProfileDetailPage />} />
+              
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           ) : (
-            // If user IS NOT logged in
+            // Logged-out routes
             <>
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/login" replace />} />
