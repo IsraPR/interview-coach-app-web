@@ -8,8 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { NovaEventFactory } from '@/api/NovaEventFactory';
 import { base64ToFloat32Array, processAudioData } from '@/lib/audioHelper';
 import AudioPlayer from '@/lib/AudioPlayer';
-import type { SessionData } from '@/types'; // Import the SessionData type
-
+import type { SessionData } from '@/types';
 
 export const useNovaSpeech = () => {
   const {
@@ -128,6 +127,10 @@ export const useNovaSpeech = () => {
   }, [connectionStatus, setConnectionStatus, handleWebSocketMessage, handleWebSocketClose, startRecordingSession]);
 
   const stopSession = useCallback(() => {
+    // Immediately stop any ongoing audio playback.
+    audioPlayerRef.current?.bargeIn();
+
+    // Stop microphone processing
     if (mediaStreamSourceRef.current && scriptProcessorRef.current) {
       mediaStreamSourceRef.current.disconnect();
       scriptProcessorRef.current.disconnect();
@@ -139,12 +142,14 @@ export const useNovaSpeech = () => {
       mediaStreamRef.current.getTracks().forEach(track => track.stop());
     }
     
+    // Send session end events
     if (promptNameRef.current && audioContentNameRef.current) {
       webSocketClient.send(NovaEventFactory.contentEnd(promptNameRef.current, audioContentNameRef.current));
       webSocketClient.send(NovaEventFactory.promptEnd(promptNameRef.current));
     }
     webSocketClient.send(NovaEventFactory.sessionEnd());
     
+    // Update state and disconnect
     stopRecordingSession();
     webSocketClient.disconnect();
     setConnectionStatus('IDLE');
