@@ -11,6 +11,7 @@ import LiveInterviewPage from '@/pages/LiveInterviewPage';
 import JobProfilesPage from '@/pages/JobProfilesPage';
 import JobProfileDetailPage from '@/pages/JobProfileDetailPage';
 import ProfilePage from '@/pages/ProfilePage';
+import FeedbackPage from '@/pages/FeedbackPage';
 import { useAuthStore } from '@/store/slices/authSlice';
 import styles from './App.module.css';
 import { useEffect } from 'react';
@@ -41,6 +42,7 @@ const AppContent = () => {
               <Link to="/" style={{ marginRight: '1rem' }}>Home</Link>
               <Link to="/profiles" style={{ marginRight: '1rem' }}>Job Profiles</Link>
               <Link to="/interview" style={{ marginRight: '1rem' }}>Live Interview</Link>
+              <Link to="/feedback" style={{ marginRight: '1rem' }}>Feedback</Link>
             </>
           )}
         </div>
@@ -52,17 +54,16 @@ const AppContent = () => {
       <main className={styles.mainContent}>
         <Routes>
           {token ? (
-            // Logged-in routes
             <>
               <Route path="/" element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/interview" element={<LiveInterviewPage />} />
               <Route path="/profiles" element={<JobProfilesPage />} />
               <Route path="/profiles/:profileId" element={<JobProfileDetailPage />} />
+              <Route path="/feedback" element={<FeedbackPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           ) : (
-            // Logged-out routes
             <>
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/login" replace />} />

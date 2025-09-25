@@ -126,11 +126,9 @@ export const useNovaSpeech = () => {
     }
   }, [connectionStatus, setConnectionStatus, handleWebSocketMessage, handleWebSocketClose, startRecordingSession]);
 
-  const stopSession = useCallback(() => {
-    // Immediately stop any ongoing audio playback.
+  const stopSession = useCallback(async () => {
     audioPlayerRef.current?.bargeIn();
 
-    // Stop microphone processing
     if (mediaStreamSourceRef.current && scriptProcessorRef.current) {
       mediaStreamSourceRef.current.disconnect();
       scriptProcessorRef.current.disconnect();
@@ -142,14 +140,12 @@ export const useNovaSpeech = () => {
       mediaStreamRef.current.getTracks().forEach(track => track.stop());
     }
     
-    // Send session end events
     if (promptNameRef.current && audioContentNameRef.current) {
       webSocketClient.send(NovaEventFactory.contentEnd(promptNameRef.current, audioContentNameRef.current));
       webSocketClient.send(NovaEventFactory.promptEnd(promptNameRef.current));
     }
     webSocketClient.send(NovaEventFactory.sessionEnd());
     
-    // Update state and disconnect
     stopRecordingSession();
     webSocketClient.disconnect();
     setConnectionStatus('IDLE');

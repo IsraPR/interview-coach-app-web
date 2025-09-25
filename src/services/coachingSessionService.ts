@@ -1,13 +1,16 @@
+// src/services/coachingSessionService.ts
+
 import { restClient } from '@/lib/axios';
-import  type {
+import type {
   SessionSetup,
   SessionSetupPayload,
   SessionData,
   CreateSessionForProfilePayload,
+  SessionSummary, // 👈 Import new types
+  SessionDetail,
 } from '@/types';
 import axios from 'axios';
 
-// A helper function for consistent error handling
 const handleApiError = (error: any, context: string): never => {
   if (axios.isAxiosError(error) && error.response) {
     const errorMessage = error.response.data?.detail || error.response.data?.message || `Failed to ${context}.`;
@@ -16,11 +19,6 @@ const handleApiError = (error: any, context: string): never => {
   throw new Error(`An unexpected error occurred while trying to ${context}.`);
 };
 
-/**
- * Creates the initial setup configuration for an interview session.
- * @param payload - The setup data (interviewer name, attitude, etc.).
- * @returns The created SessionSetup object, including its ID.
- */
 export const createSessionSetup = async (payload: SessionSetupPayload): Promise<SessionSetup> => {
   try {
     const response = await restClient.post<SessionSetup>('/api/coaching/session-setup', payload);
@@ -30,13 +28,6 @@ export const createSessionSetup = async (payload: SessionSetupPayload): Promise<
   }
 };
 
-/**
- * Creates the final session for a specific job profile, using a setup ID.
- * This fetches the dynamic configuration for the Nova Sonic WebSocket session.
- * @param profileId - The ID of the job profile to use.
- * @param payload - The object containing the session_setup_id.
- * @returns The final SessionData object with all the required prompts and configs.
- */
 export const createSessionForProfile = async (
   profileId: number,
   payload: CreateSessionForProfilePayload
@@ -49,5 +40,40 @@ export const createSessionForProfile = async (
     return response.data;
   } catch (error) {
     handleApiError(error, 'create session for profile');
+  }
+};
+
+// --- NEW FEEDBACK FUNCTIONS ---
+
+/**
+ * Fetches all completed session summaries for a given job profile.
+ * @param profileId - The ID of the job profile.
+ * @returns An array of session summaries.
+ */
+export const getCompletedSessions = async (profileId: number): Promise<SessionSummary[]> => {
+  try {
+    const response = await restClient.get<SessionSummary[]>(
+      `/api/coaching/job-profiles/${profileId}/sessions?status=COMPLETED`
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'fetch completed sessions');
+  }
+};
+
+/**
+ * Fetches the full details (including transcript) for a single session.
+ * @param profileId - The ID of the job profile.
+ * @param sessionId - The ID of the session.
+ * @returns The full session detail object.
+ */
+export const getSessionDetail = async (profileId: number, sessionId: number): Promise<SessionDetail> => {
+  try {
+    const response = await restClient.get<SessionDetail>(
+      `/api/coaching/job-profiles/${profileId}/sessions/${sessionId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'fetch session detail');
   }
 };

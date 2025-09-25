@@ -1,10 +1,10 @@
 // src/pages/LiveInterviewPage.tsx
 
-import  { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useNovaSpeech } from '@/hooks/useNovaSpeech';
 import { useJobProfileStore } from '@/store/slices/jobProfileSlice';
-import { useNotificationStore } from '@/store/slices/notificationSlice'; 
+import { useNotificationStore } from '@/store/slices/notificationSlice';
 import * as coachingSessionService from '@/services/coachingSessionService';
 import { FaMicrophone, FaStop, FaExclamationTriangle } from 'react-icons/fa';
 import styles from './LiveInterviewPage.module.css';
@@ -16,6 +16,7 @@ type PageState = 'SETUP' | 'LOADING' | 'IN_PROGRESS';
 const LiveInterviewPage = () => {
   const [pageState, setPageState] = useState<PageState>('SETUP');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const {
     connectionStatus,
@@ -27,48 +28,39 @@ const LiveInterviewPage = () => {
 
   const currentProfileId = useJobProfileStore((state) => state.currentProfileId);
 
-  // --- THE CORE WORKFLOW ORCHESTRATION ---
   const handleSetupSubmit = async (data: SessionSetupPayload) => {
     if (!currentProfileId) {
       useNotificationStore.getState().showNotification('Cannot start: No job profile is set for the interview.', 'error');
       return;
     }
-
     setIsSubmitting(true);
     setPageState('LOADING');
-
     try {
-      // Step 1: Create the session setup and get its ID
       const sessionSetup = await coachingSessionService.createSessionSetup(data);
-      
-      // Step 2: Use the setup ID to create the final session for the profile
       const sessionData = await coachingSessionService.createSessionForProfile(
         currentProfileId,
         { session_setup_id: sessionSetup.id }
       );
-
-      // Step 3: Pass the final configuration to our speech hook to start the WebSocket session
       await startSession(sessionData);
-
     } catch (error: any) {
       useNotificationStore.getState().showNotification(error.message, 'error');
-      setPageState('SETUP'); // Return to setup form on error
+      setPageState('SETUP');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // This effect transitions from LOADING to IN_PROGRESS once the WebSocket is connected
   useEffect(() => {
     if (pageState === 'LOADING' && connectionStatus === 'CONNECTED') {
       setPageState('IN_PROGRESS');
     }
   }, [connectionStatus, pageState]);
 
-  const handleMicButtonClick = () => {
+  const handleMicButtonClick = async () => {
     if (isRecording) {
-      stopSession();
-      setPageState('SETUP'); // Return to setup screen after stopping
+      await stopSession();
+      // Navigate to the feedback page and pass a state flag.
+      navigate('/feedback', { state: { fromInterview: true } });
     }
   };
 
@@ -79,22 +71,14 @@ const LiveInterviewPage = () => {
           <FaExclamationTriangle size={40} className={styles.noticeIcon} />
           <h2>No Active Job Profile</h2>
           <p>Please select a job profile to use for this interview session.</p>
-          <Link to="/profiles" className={styles.noticeButton}>
-            Go to Job Profiles
-          </Link>
+          <Link to="/profiles" className={styles.noticeButton}>Go to Job Profiles</Link>
         </div>
       );
     }
 
     switch (pageState) {
       case 'SETUP':
-        return (
-          <InterviewSetupForm
-            isSubmitting={isSubmitting}
-            onSubmit={handleSetupSubmit}
-          />
-        );
-      
+        return <InterviewSetupForm isSubmitting={isSubmitting} onSubmit={handleSetupSubmit} />;
       case 'LOADING':
         return (
           <div className={styles.loadingContainer}>
@@ -102,7 +86,6 @@ const LiveInterviewPage = () => {
             <p>Preparing your interview session...</p>
           </div>
         );
-
       case 'IN_PROGRESS':
         const isButtonDisabled = connectionStatus === 'CONNECTING';
         const buttonClass = isRecording

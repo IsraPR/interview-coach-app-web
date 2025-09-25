@@ -94,3 +94,32 @@ export interface SessionData {
   session_feedback: object; // Using a generic object for now
   created_at: string;
 }
+
+export interface SessionFeedback {
+  strengths: string[];
+  final_rating: number;
+  general_feedback: string;
+  areas_of_improvement: string[];
+}
+
+// Represents a single entry in the full_transcript array
+export interface TranscriptEntry {
+  role: 'user' | 'coach';
+  content: string;
+  timestamp: number;
+}
+
+// Represents the summary of a session, as seen in the list view
+export interface SessionSummary {
+  id: number;
+  status: 'COMPLETED';
+  prompt_name: string;
+  session_feedback: SessionFeedback;
+  created_at: string;
+  updated_at: string;
+}
+
+// Represents the full detail of a session, including the transcript
+export interface SessionDetail extends SessionSummary {
+  full_transcript: TranscriptEntry[];
+}
