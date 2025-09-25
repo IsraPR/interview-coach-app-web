@@ -8,8 +8,9 @@ import {
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import LiveInterviewPage from '@/pages/LiveInterviewPage';
-import JobProfilesPage from '@/pages/JobProfilesPage'; 
-import JobProfileDetailPage from '@/pages/JobProfileDetailPage'; 
+import JobProfilesPage from '@/pages/JobProfilesPage';
+import JobProfileDetailPage from '@/pages/JobProfileDetailPage';
+import ProfilePage from '@/pages/ProfilePage';
 import { useAuthStore } from '@/store/slices/authSlice';
 import styles from './App.module.css';
 import { useEffect } from 'react';
@@ -38,7 +39,6 @@ const AppContent = () => {
           {token && (
             <>
               <Link to="/" style={{ marginRight: '1rem' }}>Home</Link>
-              {/* 👇 Add the new nav link */}
               <Link to="/profiles" style={{ marginRight: '1rem' }}>Job Profiles</Link>
               <Link to="/interview" style={{ marginRight: '1rem' }}>Live Interview</Link>
             </>
@@ -55,12 +55,10 @@ const AppContent = () => {
             // Logged-in routes
             <>
               <Route path="/" element={<HomePage />} />
-              <Route path="/profile" element={<div>My Profile Page</div>} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/interview" element={<LiveInterviewPage />} />
-              {/* 👇 Add the new routes */}
               <Route path="/profiles" element={<JobProfilesPage />} />
               <Route path="/profiles/:profileId" element={<JobProfileDetailPage />} />
-              
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           ) : (

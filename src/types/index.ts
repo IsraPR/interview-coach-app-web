@@ -45,3 +45,19 @@ export type CreateJobProfilePayload = {
 };
 
 export type UpdateJobProfilePayload = Partial<CreateJobProfilePayload>;
+
+
+export interface Resume {
+  id: number;
+  current_role: string;
+  key_skills: string[];
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ResumePayload = {
+  current_role: string;
+  key_skills: string[];
+  description: string;
+};

@@ -2,14 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserStore } from '@/store/slices/userSlice';
 import { useAuthStore } from '@/store/slices/authSlice';
-import { FaUserCircle, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt, FaUser, FaFileAlt } from 'react-icons/fa';
 import styles from './ProfileDropdown.module.css';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Select state and actions
   const user = useUserStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
@@ -37,7 +36,6 @@ const ProfileDropdown = () => {
 
       {isOpen && (
         <div className={styles.dropdownMenu}>
-          {/* Conditionally render user info or a loading state */}
           {user ? (
             <div className={styles.userInfo}>
               <strong>{`${user.first_name} ${user.last_name}`}</strong>
@@ -54,6 +52,12 @@ const ProfileDropdown = () => {
               <Link to="/profile" className={styles.menuItem} onClick={() => setIsOpen(false)}>
                 <FaUser className={styles.icon} />
                 My Profile
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile" className={styles.menuItem} onClick={() => setIsOpen(false)}>
+                <FaFileAlt className={styles.icon} />
+                Resume
               </Link>
             </li>
             <li>
