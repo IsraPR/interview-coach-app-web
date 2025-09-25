@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useJobProfileStore } from '@/store/slices/jobProfileSlice';
 import JobProfileForm from './JobProfileForm';
 import styles from './CreateProfileModal.module.css';
+import type { CreateJobProfilePayload } from '@/types'; // Import the type
 
 interface CreateProfileModalProps {
   isOpen: boolean;
@@ -12,13 +13,12 @@ const CreateProfileModal: React.FC<CreateProfileModalProps> = ({ isOpen, onClose
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createProfile = useJobProfileStore((state) => state.createProfile);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: CreateJobProfilePayload) => { // Use the specific type
     setIsSubmitting(true);
     try {
       await createProfile(data);
-      onClose(); // Close the modal on success
+      onClose();
     } catch (error) {
-      // The error notification is already handled in the slice
       console.error('Failed to create profile:', error);
     } finally {
       setIsSubmitting(false);
@@ -36,7 +36,9 @@ const CreateProfileModal: React.FC<CreateProfileModalProps> = ({ isOpen, onClose
           <h3>Create New Job Profile</h3>
           <button onClick={onClose} className={styles.closeButton}>&times;</button>
         </div>
-        <JobProfileForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+        <div className={styles.content}>
+          <JobProfileForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+        </div>
       </div>
     </div>
   );

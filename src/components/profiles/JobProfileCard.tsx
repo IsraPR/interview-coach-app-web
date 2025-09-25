@@ -60,7 +60,7 @@ const JobProfileCard: React.FC<JobProfileCardProps> = ({ profile, isActive }) =>
             <p className={styles.targetRole}>{profile.target_role}</p>
           </div>
           <p className={styles.description}>
-            {profile.job_description_text.substring(0, 100)}...
+            {profile.job_description.substring(0, 100)}...
           </p>
         </div>
         

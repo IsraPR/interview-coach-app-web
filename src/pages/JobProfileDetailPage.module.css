@@ -64,3 +64,22 @@
   color: #555;
   line-height: 1.6;
 }
+
+.preformatted {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detailList {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.detailList li {
+  margin-bottom: 8px;
+}

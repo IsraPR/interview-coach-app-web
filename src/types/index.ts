@@ -20,12 +20,16 @@ export interface User {
   last_name: string;
 }
 
+
 export interface JobProfile {
   id: number;
   profile_name: string;
   target_role: string;
-  job_description_text: string;
-  resume_text: string;
+  job_description: string; 
+  company_name: string;
+  company_background: string;
+  responsibilities: string[]; 
+  required_skills: string[]; 
   created_at: string;
   updated_at: string;
 }
@@ -33,7 +37,11 @@ export interface JobProfile {
 export type CreateJobProfilePayload = {
   profile_name: string;
   target_role: string;
-  job_description_text: string;
+  job_description: string;
+  company_name: string;
+  company_background: string;
+  responsibilities: string[];
+  required_skills: string[];
 };
 
 export type UpdateJobProfilePayload = Partial<CreateJobProfilePayload>;

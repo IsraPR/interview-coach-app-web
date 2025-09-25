@@ -3,11 +3,8 @@ import type { JobProfile, CreateJobProfilePayload } from '@/types';
 import styles from './JobProfileForm.module.css';
 
 interface JobProfileFormProps {
-  // If an existing profile is passed, we're in "edit" mode
   existingProfile?: JobProfile;
-  // The function to call when the form is submitted
   onSubmit: (data: CreateJobProfilePayload) => Promise<void>;
-  // A flag to indicate if the submission is in progress
   isSubmitting: boolean;
 }
 
@@ -15,22 +12,36 @@ const JobProfileForm: React.FC<JobProfileFormProps> = ({ existingProfile, onSubm
   const [profileName, setProfileName] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [companyBackground, setCompanyBackground] = useState('');
+  const [responsibilities, setResponsibilities] = useState('');
+  const [requiredSkills, setRequiredSkills] = useState('');
 
-  // If we are in "edit" mode, pre-fill the form with the existing data
   useEffect(() => {
     if (existingProfile) {
       setProfileName(existingProfile.profile_name);
       setTargetRole(existingProfile.target_role);
-      setJobDescription(existingProfile.job_description_text);
+      setJobDescription(existingProfile.job_description);
+      setCompanyName(existingProfile.company_name);
+      setCompanyBackground(existingProfile.company_background);
+      setResponsibilities(existingProfile.responsibilities.join('\n'));
+      setRequiredSkills(existingProfile.required_skills.join('\n'));
     }
   }, [existingProfile]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const responsibilitiesArray = responsibilities.split('\n').filter(item => item.trim() !== '');
+    const requiredSkillsArray = requiredSkills.split('\n').filter(item => item.trim() !== '');
+
     onSubmit({
       profile_name: profileName,
       target_role: targetRole,
-      job_description_text: jobDescription,
+      job_description: jobDescription,
+      company_name: companyName,
+      company_background: companyBackground,
+      responsibilities: responsibilitiesArray,
+      required_skills: requiredSkillsArray,
     });
   };
 
@@ -43,7 +54,7 @@ const JobProfileForm: React.FC<JobProfileFormProps> = ({ existingProfile, onSubm
           type="text"
           value={profileName}
           onChange={(e) => setProfileName(e.target.value)}
-          placeholder="e.g., Senior Frontend Developer"
+          placeholder="e.g., Senior Python Developer"
           required
         />
       </div>
@@ -54,7 +65,18 @@ const JobProfileForm: React.FC<JobProfileFormProps> = ({ existingProfile, onSubm
           type="text"
           value={targetRole}
           onChange={(e) => setTargetRole(e.target.value)}
-          placeholder="e.g., Frontend Engineer at a FAANG company"
+          placeholder="e.g., Lead Backend Engineer at Google"
+          required
+        />
+      </div>
+      <div className={styles.formGroup}>
+        <label htmlFor="companyName">Company Name</label>
+        <input
+          id="companyName"
+          type="text"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          placeholder="e.g., Google"
           required
         />
       </div>
@@ -64,8 +86,41 @@ const JobProfileForm: React.FC<JobProfileFormProps> = ({ existingProfile, onSubm
           id="jobDescription"
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste the job description here..."
-          rows={10}
+          placeholder="Paste the full job description here..."
+          rows={8}
+          required
+        />
+      </div>
+      <div className={styles.formGroup}>
+        <label htmlFor="companyBackground">Company Background</label>
+        <textarea
+          id="companyBackground"
+          value={companyBackground}
+          onChange={(e) => setCompanyBackground(e.target.value)}
+          placeholder="Paste the company's 'About Us' section or a brief description..."
+          rows={5}
+          required
+        />
+      </div>
+      <div className={styles.formGroup}>
+        <label htmlFor="responsibilities">Responsibilities (one per line)</label>
+        <textarea
+          id="responsibilities"
+          value={responsibilities}
+          onChange={(e) => setResponsibilities(e.target.value)}
+          placeholder="Design, implement, and maintain complex applications..."
+          rows={5}
+          required
+        />
+      </div>
+      <div className={styles.formGroup}>
+        <label htmlFor="requiredSkills">Required Skills (one per line)</label>
+        <textarea
+          id="requiredSkills"
+          value={requiredSkills}
+          onChange={(e) => setRequiredSkills(e.target.value)}
+          placeholder="5+ years of experience in Python..."
+          rows={5}
           required
         />
       </div>
