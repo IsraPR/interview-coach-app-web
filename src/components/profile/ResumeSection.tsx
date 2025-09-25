@@ -1,5 +1,3 @@
-// src/components/profile/ResumeSection.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useUserStore } from '@/store/slices/userSlice';
 import { useShallow } from 'zustand/react/shallow'; 
