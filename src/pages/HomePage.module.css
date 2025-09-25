@@ -97,3 +97,14 @@
   font-size: 1.5rem;
   margin-bottom: 20px;
 }
+
+.multiIcon {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.multiIcon .stepIcon {
+  margin-bottom: 0; /* Override the default margin */
+}
