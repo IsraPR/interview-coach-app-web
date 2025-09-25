@@ -61,3 +61,36 @@ export type ResumePayload = {
   key_skills: string[];
   description: string;
 };
+
+
+export interface SessionSetupPayload {
+  interviewer_name: string;
+  interviewer_attitude: string;
+  preferred_language: string;
+}
+
+
+export interface SessionSetup extends SessionSetupPayload {
+  id: number;
+  model_voice: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSessionForProfilePayload {
+  session_setup_id: number;
+}
+
+export interface SessionData {
+  id: number;
+  status: string;
+  prompt_name: string;
+  s2s_system_prompt: string;
+  inference_config: {
+    maxTokens: number;
+    temperature: number;
+    topP: number;
+  };
+  session_feedback: object; // Using a generic object for now
+  created_at: string;
+}

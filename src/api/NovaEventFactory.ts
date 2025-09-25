@@ -1,12 +1,13 @@
 // src/api/NovaEventFactory.ts
 
-// This is a high-fidelity TypeScript version of the S2sEvent.js helper class.
-// It includes the default configurations and creates the exact payloads the sample uses.
+import { SessionData } from '@/types';
+
+// Define a type for the inference configuration for clarity
+type InferenceConfig = SessionData['inference_config'];
 
 export class NovaEventFactory {
-  // --- DEFAULT CONFIGURATIONS (as seen in the sample) ---
-
-  static DEFAULT_INFER_CONFIG = {
+  // --- DEFAULT CONFIGURATIONS ---
+  static DEFAULT_INFER_CONFIG: InferenceConfig = {
     maxTokens: 1024,
     topP: 0.95,
     temperature: 0.7,
@@ -19,14 +20,17 @@ export class NovaEventFactory {
     sampleRateHertz: 24000,
     sampleSizeBits: 16,
     channelCount: 1,
-    voiceId: "matthew", // A default voice
+    voiceId: "matthew",
     encoding: "base64",
     audioType: "SPEECH",
   };
 
   // --- EVENT CREATION METHODS ---
 
-  static sessionStart(inferenceConfig = this.DEFAULT_INFER_CONFIG) {
+  /**
+   * UPDATED: Now accepts an optional inferenceConfig.
+   */
+  static sessionStart(inferenceConfig: InferenceConfig = this.DEFAULT_INFER_CONFIG) {
     return { event: { sessionStart: { inferenceConfiguration: inferenceConfig } } };
   }
 
@@ -35,18 +39,9 @@ export class NovaEventFactory {
       event: {
         promptStart: {
           promptName: promptName,
-          // The sample includes these default output configurations
-          textOutputConfiguration: {
-            mediaType: "text/plain",
-          },
+          textOutputConfiguration: { mediaType: "text/plain" },
           audioOutputConfiguration: audioOutputConfig,
-          toolUseOutputConfiguration: {
-            mediaType: "application/json",
-          },
-          toolConfiguration: {
-            "tools": []
-          }
-          // We can omit the toolConfiguration if not using tools for now
+          toolUseOutputConfiguration: { mediaType: "application/json" },
         },
       },
     };
@@ -59,23 +54,24 @@ export class NovaEventFactory {
           promptName,
           contentName,
           type: 'TEXT',
-          interactive: false,
+          interactive: true,
           role,
-          textInputConfiguration: {
-            mediaType: 'text/plain',
-          },
+          textInputConfiguration: { mediaType: 'text/plain' },
         },
       },
     };
   }
 
-  static textInput(promptName: string, contentName: string, content: string) {
+  /**
+   * UPDATED: Now accepts a systemPrompt argument.
+   */
+  static textInput(promptName: string, contentName: string, systemPrompt: string = this.DEFAULT_SYSTEM_PROMPT) {
     return {
       event: {
         textInput: {
           promptName,
           contentName,
-          content,
+          content: systemPrompt,
         },
       },
     };
@@ -101,7 +97,6 @@ export class NovaEventFactory {
           type: 'AUDIO',
           interactive: true,
           role: 'USER',
-          // The sample includes a default audio input config here
           audioInputConfiguration: {
             mediaType: "audio/lpcm",
             sampleRateHertz: 16000,

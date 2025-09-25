@@ -8,6 +8,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { NovaEventFactory } from '@/api/NovaEventFactory';
 import { base64ToFloat32Array, processAudioData } from '@/lib/audioHelper';
 import AudioPlayer from '@/lib/AudioPlayer';
+import type { SessionData } from '@/types'; // Import the SessionData type
+
 
 export const useNovaSpeech = () => {
   const {
@@ -36,25 +38,16 @@ export const useNovaSpeech = () => {
 
     if (event.textOutput) {
       const content = event.textOutput.content;
-      
-      // --- BARGE-IN ---
       if (content.startsWith('{')) {
         try {
           const parsedContent = JSON.parse(content);
           if (parsedContent.interrupted === true) {
-            console.log('Interruption event received from server.');
             audioPlayerRef.current?.bargeIn();
-            return; // Stop processing this event further
+            return;
           }
-        } catch (e) {
-          console.error(e);
-          // Not a valid JSON, so treat it as regular text.
-        }
+        } catch (e) { /* Not JSON, treat as text */ }
       }
-      
-      // If it's not an interruption, it's a regular transcript.
       setTranscript(content);
-
     } else if (event.audioOutput) {
       const audioData = base64ToFloat32Array(event.audioOutput.content);
       audioPlayerRef.current?.playAudio(audioData);
@@ -72,7 +65,7 @@ export const useNovaSpeech = () => {
     }
   }, [setConnectionStatus, stopRecordingSession]);
 
-  const startSession = useCallback(async () => {
+  const startSession = useCallback(async (sessionData: SessionData) => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/^http/, 'ws');
     const fullUrl = `${baseUrl}/ws/interview/live-interaction/`;
 
@@ -88,14 +81,14 @@ export const useNovaSpeech = () => {
       webSocketClient.registerOnMessageHandler(handleWebSocketMessage);
       webSocketClient.registerOnCloseHandler(handleWebSocketClose);
 
-      promptNameRef.current = crypto.randomUUID();
+      promptNameRef.current = sessionData.prompt_name;
       const systemPromptContentName = crypto.randomUUID();
       audioContentNameRef.current = crypto.randomUUID();
 
-      webSocketClient.send(NovaEventFactory.sessionStart());
+      webSocketClient.send(NovaEventFactory.sessionStart(sessionData.inference_config));
       webSocketClient.send(NovaEventFactory.promptStart(promptNameRef.current));
       webSocketClient.send(NovaEventFactory.contentStartText(promptNameRef.current, systemPromptContentName));
-      webSocketClient.send(NovaEventFactory.textInput(promptNameRef.current, systemPromptContentName, NovaEventFactory.DEFAULT_SYSTEM_PROMPT));
+      webSocketClient.send(NovaEventFactory.textInput(promptNameRef.current, systemPromptContentName, sessionData.s2s_system_prompt));
       webSocketClient.send(NovaEventFactory.contentEnd(promptNameRef.current, systemPromptContentName));
       webSocketClient.send(NovaEventFactory.contentStartAudio(promptNameRef.current, audioContentNameRef.current));
 
