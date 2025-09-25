@@ -1,6 +1,4 @@
-// src/api/NovaEventFactory.ts
-
-import { SessionData } from '@/types';
+import type { SessionData } from '@/types';
 
 // Define a type for the inference configuration for clarity
 type InferenceConfig = SessionData['inference_config'];
